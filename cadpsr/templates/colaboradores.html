@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-10">
+            <h3>Colaboradores</h3>
+        </div>
+        <div class="col-sm-2">
+
+            <a class="btn btn-outline-primary" href="/novo_clb" role="button">Novo Cadastro</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-sm-9">
+            <small>
+                <em><strong>Cadastrados nesta entidade:</strong> {{ clb_entidade }}</em>
+            </small>
+        </div>
+        {% if current_user.tipo_clb == 'GESTOR' %}
+        <div class="col-sm-3">
+            <small>
+                <em><strong>Cadastrados no CadPSR:</strong> {{ clb_total }}</em>
+            </small>
+        </div>
+        {% endif %}
+    </div>
+
+    <br>
+
+    <h4><em>Pesquisa de Colaboradores</em></h4>
+
+    <br>
+        <div class="row">
+            <div class="col-sm-2">
+                FILTRO
+            </div>
+            <div class="col-sm-2">
+                DADO
+            </div>
+        </div>
+
+        <form method="POST">
+        <div class="row">
+            <div class="col-sm-2">
+                <select class="form-select" name="campo" id="campo">
+                    <option value="ID">ID</option>
+                    <option value="NOME" selected>NOME</option>
+                    <option value="CPF">CPF</option >
+                </select>
+            </div>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" id="dado"
+                name="dado"
+                placeholder="Informe o dado a ser pesquisado" autofocus/>
+            </div>
+            <div class="col-sm-2">
+                <button type="submit" class="btn btn-outline-dark">Pesquisar</button>
+            </div>
+        </div>
+        </form>
+
+        <br>
+
+        {% if current_user.tipo_clb == 'GESTOR' %}
+        <small>
+            <em>
+                <strong>PALAVRAS-CHAVE</strong> (com filtro NOME selecionado)<br>
+                <strong>.t</strong> para todos Colaboradores cadastrados no CadPSR;
+                <strong> .e1</strong>, <strong>.e2</strong>, <strong>.e3</strong> ou <strong>.e4</strong> para Colaboradores em Entidades específicas;<br>
+                <strong>.acesso</strong> para registro de acesso de todos Colaboradores do CadPSR;
+                <strong> .acesso1</strong>, <strong>.acesso2</strong>, <strong>.acesso3</strong> ou <strong>.acesso4</strong> para Colaboradores em Entidades específicas.
+            </em>
+        </small>
+        {% else %}
+        <small>
+            <em>
+                <strong>PALAVRAS-CHAVE</strong> (com filtro NOME selecionado)<br>
+                <strong>.t</strong> para todos Colaboradores cadastrados em sua Entidade;<br>
+                <strong>.acesso</strong> para registro de acesso dos Colaboradores de sua Entidade;
+            </em>
+        </small>
+        {% endif %}
+
+        <br>
+        <br>
+
+    <div>
+    {% if busca == True %}
+    {% if acessos %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th style="width: 8%">#</th>
+                <th style="width: 5%">ID</th>
+                <th style="width: 9%">STATUS</th>
+                <th style="width: 23%">NOME</th>
+                <th style="width: 25%">LOTACAO</th>
+                <th style="width: 15%">DATA</th>
+                <th style="width: 15%">HORA</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for acesso in acessos %}
+        <tr>
+        <th scope="row">{{ loop.index }}</th>
+            <form class="" method="POST">
+                <td>{{ acesso.id_clb }}</td>
+                <td>{{ acesso.status_clb }}</td>
+                <td>{{ acesso.nome_clb }}</td>
+                <td>{{ campos_cad['entidades'][acesso.lotacao_clb] }}</td>
+                <td>{{ acesso.data_hora[:10] }}</td>
+                <td>{{ acesso.data_hora[11:] }}</td>
+            </form>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+    {% else %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th style="width: 8%">#</th>
+                <th style="width: 5%">STATUS</th>
+                <th style="width: 9%">ID</th>
+                <th style="width: 30%">NOME</th>
+                <th style="width: 10%">TIPO</th>
+                <th style="width: 35%">LOTAÇÃO</th>
+                <th style="width: 3%"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if colaborador %}
+        <tr>
+        <th scope="row"></th>
+            <form class="" method="POST">
+                <td>{{ colaborador.status }}</td>
+                <td>{{ colaborador.id}}</td>
+                <td>{{ colaborador.nome_civil}}</td>
+                <td>{{ colaborador.tipo_clb}}</td>
+                <td>{{ campos_cad['entidades'][colaborador.lotacao] }}</td>
+                <td>
+                    <a class="btn btn-outline-success" href="/cadastro_clb/{{ colaborador.id }}"
+                        role="button">Visualizar</a>
+                </td>
+            </form>
+        </tr>
+        {% else %}
+        {% for colaborador in colaboradores %}
+            <tr>
+            <th scope="row">{{ loop.index }}</th>
+                <form class="" method="POST">
+                    <td>{{ colaborador.status }}</td>
+                    <td>{{ colaborador.id}}</td>
+                    <td>{{ colaborador.nome_civil}}</td>
+                    <td>{{ colaborador.tipo_clb}}</td>
+                    <td>{{ campos_cad['entidades'][colaborador.lotacao] }}</td>
+                    <td>
+                        <a class="btn btn-outline-success" href="/cadastro_clb/{{ colaborador.id }}"
+                            role="button">Visualizar</a>
+                    </td>
+                </form>
+            </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+    </table>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

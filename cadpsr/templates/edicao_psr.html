@@ -1,0 +1,1359 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+<form action="/edicao_psr/{{ pessoa.id }}" method="POST">
+    <div class="row">
+        <div class="col-sm-10">
+            <h5>{{ titulo_body_1 }}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-10">
+            <h2>{{ titulo_body_2 }}</h2>
+        </div>
+        <div class="col-sm-1">
+            <a class="btn btn-outline-dark" href="\cadastro_psr/{{ pessoa.id }}"
+                role="button">Voltar</a>
+        </div>
+        <div class="col-sm-1">
+            <button type="submit" class="btn btn-outline-success"
+                id="salvar" name="salvar"  value="">Salvar</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <small><em><strong>Cadastro efetuado em:</strong> {{ data_criacao }}</em></small>
+        </div>
+        <div class="col-sm-5">
+            <small><em><strong>Atualizado em:</strong> {{ data_atualizacao }}</em></small>
+        </div>
+    </div>
+
+    <br>
+
+    <small><em>*É obrigatório o preenchimento em campos com *. Nos campos de documentos utilize apenas números.</em></small>
+
+    <br>
+    <br>
+
+    <div class="row">
+        <div class="col-sm-1">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                value="{{ pessoa.id }}" disabled/>
+        </div>
+        <div class="col-sm-2">
+            <label for="status">STATUS</label>
+            <input type="text" class="form-control" id="status"
+                name="status" value="{{ pessoa.status }}" disabled/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <label for="nome_civil">*Nome Civil</label>
+            <input type="text" class="form-control" id="nome_civil"
+                name="nome_civil" placeholder="Informe o nome civil "
+                value="{{ pessoa.nome_civil }}" required/>
+        </div>
+        <div class="col-sm-3">
+            <label for="cpf">*CPF (somente números)</label>
+            <input type="text" class="form-control" id="cpf"
+                name="cpf" placeholder="Informe o CPF"
+                value="{{ pessoa.cpf }}" required disabled/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <label for="nome_social">Nome Social</label>
+            <input type="text" class="form-control" id="nome_social"
+                name="nome_social" placeholder="Informe o nome social"
+                value="{{ pessoa.nome_social }}"/>
+        </div>
+        <div class="col-sm-4">
+            <label for="data_nascimento">*Data de Nascimento (somente números)</label>
+            <input class="form-control" id="data_nascimento" type="date"
+            name="data_nascimento"
+            min="1921-01-01" max="2021-12-01"
+            value="{{ pessoa.data_nascimento }}" required/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="apelido">Apelido</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="cidade_atual">*Cidade atual</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="entidade_referencia">*Entidade Referência</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="apelido"
+            name="apelido" placeholder="Informe o apelido"
+            value="{{ pessoa.apelido }}"/>
+        </div>
+        <div class="col-sm-4">
+            <select class="form-select" name="cidade_atual" id="cidade_atual"
+                {{ estado }} required>
+                {% if pessoa.cidade_atual %}
+                <option value="{{ pessoa.cidade_atual }}"
+                selected>#{{ campos_cad['cidades'][pessoa.cidade_atual].upper() }}
+                </option>
+                {% for cidade_atual in campos_cad['cidades'] %}
+                    {% if cidade_atual not in pessoa.cidade_atual %}
+                <option value="{{ cidade_atual }}"
+                    >{{ campos_cad['cidades'][cidade_atual].upper() }}
+                </option>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <option value="" selected></option>
+                {% for cidade_atual in campos_cad['cidades'] %}
+                <option value="{{ cidade_atual }}"
+                >{{ campos_cad['cidades'][cidade_atual].upper() }}
+                </option>
+                {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <select class="form-select" name="entidade_referencia"
+                id="entidade_referencia" required>
+                {% if pessoa.entidade_referencia %}
+                <option value="{{ pessoa.entidade_referencia }}"
+                selected>#{{ campos_cad['entidades'][pessoa.entidade_referencia] }}
+                </option>
+                {% for entidade_referencia in campos_cad['entidades'] %}
+                    {% if entidade_referencia not in pessoa.entidade_referencia %}
+                    {% if entidade_referencia != '5' %}
+                <option value="{{ entidade_referencia }}">
+                {{ campos_cad['entidades'][entidade_referencia] }}
+                </option>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <option value="" selected></option>
+                {% for entidade_referencia in campos_cad['entidades'] %}
+                {% if entidade_referencia != '5' %}
+                <option value="{{ entidade_referencia }}">
+                {{ campos_cad['entidades'][entidade_referencia] }}
+                </option>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-5">
+            <label for="Nome">E-mail</label>
+            <input type="text" class="form-control" id="email"
+                name="email" placeholder="Informe o e-mail"
+                value="{{ pessoa.email }}"/>
+        </div>
+        <div class="col-sm-2">
+            <label for="telefone">Telefone</label>
+            <input type="text" class="form-control" id="telefone"
+                name="telefone" placeholder="Informe o telefone"
+                value="{{ pessoa.telefone }}"/>
+        </div>
+        <div class="col-sm-2">
+            <label for="celular">Celular</label>
+            <input type="text" class="form-control" id="celular"
+                name="celular" placeholder="Informe o celular"
+                value="{{ pessoa.celular }}"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="etnia">Raça / Etnia</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="sexo">Sexo</label>
+        </div>
+        <div class="col-sm-3">
+            <label for="orientacao_sexual">Orientação Sexual</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="identidade_genero">Identidade de Gênero</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <select class="form-select" name="etnia" id="etnia">
+                {% if pessoa.etnia %}
+                <option value="{{ pessoa.etnia }}"
+                selected>#{{ campos_cad['etnias'][pessoa.etnia].upper() }}
+                </option>
+                {% for etnia in campos_cad['etnias'] %}
+                {% if etnia not in pessoa.etnia %}
+                <option value="{{ etnia }}"
+                >{{ campos_cad['etnias'][etnia].upper() }}
+                </option>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <option value="" selected></option>
+                {% for etnia in campos_cad['etnias'] %}
+                <option value="{{ etnia }}"
+                >{{ campos_cad['etnias'][etnia].upper() }}
+                </option>
+                {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <select class="form-select" name="sexo" id="sexo">
+                {% if pessoa.sexo %}
+                <option value="{{ pessoa.sexo }}"
+                selected>#{{ campos_cad['sexos'][pessoa.sexo].upper() }}
+                </option>
+                {% for sexo in campos_cad['sexos'] %}
+                    {% if sexo not in pessoa.sexo %}
+                <option value="{{ sexo }}"
+                >{{ campos_cad['sexos'][sexo].upper() }}
+                </option>
+                    {% endif %}
+                {% endfor %}
+                {% else %}
+                <option value="" selected></option>
+                {% for sexo in campos_cad['sexos'] %}
+                <option value="{{ sexo }}"
+                >{{ campos_cad['sexos'][sexo].upper() }}
+                </option>
+                {% endfor %}
+                {% endif %}
+
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <select class="form-select" name="orientacao_sexual"
+                id="orientacao_sexual">
+                {% if pessoa.orientacao_sexual %}
+                <option value="{{ pessoa.orientacao_sexual }}"
+                selected>#{{ campos_cad['orientacoes_sexual'][pessoa.orientacao_sexual].upper() }}
+                </option>
+                {% for orientacao_sexual in campos_cad['orientacoes_sexual'] %}
+                    {% if orientacao_sexual not in pessoa.orientacao_sexual %}
+                <option value="{{ orientacao_sexual }}"
+                >{{ campos_cad['orientacoes_sexual'][orientacao_sexual].upper() }}
+                </option>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <option value="" selected></option>
+                {% for orientacao_sexual in campos_cad['orientacoes_sexual'] %}
+                <option value="{{ orientacao_sexual }}"
+                >{{ campos_cad['orientacoes_sexual'][orientacao_sexual].upper() }}
+                </option>
+                {% endfor %}
+                {% endif %}
+
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <select class="form-select" name="identidade_genero"
+                id="identidade_genero">
+                {% if pessoa.identidade_genero %}
+                <option value="{{ pessoa.identidade_genero }}"
+                selected>#{{ campos_cad['identidades_genero'][pessoa.identidade_genero].upper() }}
+                </option>
+                {% for identidade_genero in campos_cad['identidades_genero'] %}
+                {% if identidade_genero not in pessoa.identidade_genero %}
+                <option value="{{ identidade_genero }}"
+                >{{ campos_cad['identidades_genero'][identidade_genero].upper() }}
+                </option>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <option value="" selected></option>
+                {% for identidade_genero in campos_cad['identidades_genero'] %}
+                <option value="{{ identidade_genero }}"
+                >{{ campos_cad['identidades_genero'][identidade_genero].upper() }}
+                </option>
+                {% endfor %}
+                {% endif %}
+
+            </select>
+        </div>
+    </div>
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="row">
+        <div class="col-sm-2">
+            <label for="rg">RG</label>
+        </div>
+        <div class="col-sm-1">
+            <label for="rg_uf">UF</label>
+        </div>
+        <div class="col-sm-3">
+            <label for="rg_emissao">Data de Emissão RG</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="rg_emissor">Órgão Emissor</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="rg" name="rg"
+                placeholder="Informe o RG" value="{{ pessoa.rg }}"/>
+        </div>
+        <div class="col-sm-1">
+            <select class="form-select" name="rg_uf" id="rg_uf">
+                {% if pessoa.rg_uf %}
+                <option value="{{ pessoa.uf }}"
+                selected>#{{ pessoa.uf }}
+                </option>
+                {% for uf in campos_cad['uf_s'] %}
+                {% if uf not in pessoa.uf %}
+                <option value="{{ uf }}"
+                >{{ campos_cad['uf_s'][uf] }}
+                </option>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <option value="" selected></option>
+                {% for uf in campos_cad['uf_s'] %}
+                <option value="{{ uf }}"
+                >{{ campos_cad['uf_s'][uf] }}
+                </option>
+                {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <input class="form-control" id="rg_emissao" type="date"
+                name="rg_emissao" min="1921-01-01" max="2021-12-01"
+                value="{{ pessoa.rg_emissao }}"/>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="rg_emissor"
+                name="rg_emissor" placeholder="Informe o Órgão Emissor"
+                value="{{ pessoa.rg_emissor }}"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-2">
+            <label for="titulo_eleitor">Título de Eleitor</label>
+            <input type="text" class="form-control" id="titulo_eleitor"
+                name="titulo_eleitor" placeholder="Informe o Título"
+                value="{{ pessoa.titulo_eleitor }}"/>
+        </div>
+        <div class="col-sm-1">
+            <label for="titulo_zona">Zona</label>
+            <input type="text" class="form-control" id="titulo_zona"
+                name="titulo_zona"placeholder="Zona Eleitoral"
+                value="{{ pessoa.titulo_zona }}"/>
+        </div>
+        <div class="col-sm-2">
+            <label for="titulo_secao">Seção</label>
+            <input type="text" class="form-control" id="titulo_secao"
+                name="titulo_secao" placeholder="Seção Eleitoral"
+                value="{{ pessoa.titulo_secao }}"/>
+        </div>
+        <div class="col-sm-3">
+            <label for="titulo_emissao">Data de Emissão Título</label>
+            <input class="form-control" id="titulo_emissao" type="date"
+                name="titulo_emissao" value="{{ pessoa.titulo_emissao }}"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="cns">CNS</label>
+            <input type="text" class="form-control" id="cns"
+                name="cns" placeholder="Informe o CNS"
+                value="{{ pessoa.cns }}"/>
+        </div>
+        <div class="col-sm-2">
+            <label for="nis">NIS</label>
+            <input type="text" class="form-control" id="nis"
+                name="nis" placeholder="Informe o NIS"
+                value="{{ pessoa.nis }}"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <label for="certidao_nascimento">Certidão de Nascimento</label>
+        </div>
+        <div class="col-sm-3">
+            <label for="naturalidade">Naturalidade</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="nacionalidade">Nacionalidade</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="certidao_nascimento"
+            name="certidao_nascimento" placeholder="Informe o nº da Certidão..."
+            value="{{ pessoa.certidao_nascimento }}"/>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="naturalidade" name="naturalidade"
+                placeholder="Informe a naturalidade"
+                value="{{ pessoa.naturalidade }}"/>
+        </div>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="nacionalidade" name="nacionalidade"
+                placeholder="Informe a nacionalidade"
+                value="{{ pessoa.nacionalidade }}"/>
+        </div>
+    </div>
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="row">
+            <label class="form-check-label" for="questao_migracao">
+                <strong>
+                Está em situação de migração/refúgio por motivos: de guerra; políticos; ou econômicos relativos ao País de origem?
+            </strong>
+            </label>
+    </div>
+    <br>
+    {% if pessoa.questao_migracao %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_migracao"
+            id="questao_migracao_{{ pessoa.questao_migracao }}"
+            value="{{ pessoa.questao_migracao }}" checked>
+        <label class="form-check-label" for="questao_migracao_{{ pessoa.questao_migracao }}">
+            {{ campos_cad['questao_migracao'][pessoa.questao_migracao] }}
+        </label>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_migracao %}
+    {% for alternativa in campos_cad['questao_migracao'] %}
+    {% if alternativa not in pessoa.questao_migracao %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_migracao"
+            id="questao_migracao_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_migracao_{{ alternativa }}">
+            {{ campos_cad['questao_migracao'][alternativa] }}
+        </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in campos_cad['questao_migracao'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_migracao"
+            id="questao_migracao_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_migracao_{{ alternativa }}">
+            {{ campos_cad['questao_migracao'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <div class="col-sm-5">
+            <label for="crnm">Carteira de Registro Nacional Migratório (CRNM)</label>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-2">
+            <label for="crnm_rnm">RNM</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="crnm_filiacao_a">Filiação</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="crnm_filiacao_b">Filiação</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="crnm_rnm"
+            name="crnm_rnm" placeholder="Informe o RNM"
+            value="{{ pessoa.crnm_rnm }}"/>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="crnm_filiacao_a"
+            name="crnm_filiacao_a" placeholder="Informe a filiação"
+            value="{{ pessoa.crnm_filiacao_a }}"/>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="crnm_filiacao_b"
+            name="crnm_filiacao_b" placeholder="Informe a filiação"
+            value="{{ pessoa.crnm_filiacao_b }}"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="crnm_validade">Validade</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="crnm_classificacao">Classificação</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="crnm_domicilio">Domicílio</label>
+        </div>
+        <div class="col-sm-3">
+            <label for="crnm_emissao">Emissão</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <input class="form-control" id="crnm_validade" type="date"
+                name="crnm_validade" value="{{ pessoa.crnm_validade }}"/>
+        </div>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="crnm_classificacao"
+                name="crnm_classificacao" placeholder="Informe a classificação"
+                value="{{ pessoa.crnm_classificacao }}"/>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="crnm_domicilio"
+                name="crnm_domicilio" placeholder="Informe o domicílio"
+                value="{{ pessoa.crnm_domicilio }}"/>
+        </div>
+        <div class="col-sm-3">
+            <input class="form-control" id="crnm_emissao" type="date"
+                name="crnm_emissao" value="{{ pessoa.crnm_emissao }}"/>
+        </div>
+    </div>
+
+    <br>
+
+    <br>
+    <br>
+    <br>
+
+    <h2>Questionário</h2>
+
+    <hr>
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label for="questao_1">
+            <strong>
+                1) Onde costuma dormir? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_1 %}
+    {% for alternativa in pessoa.questao_1 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+         name="questao_1" value="{{ alternativa }}" checked>
+      <label class="form-check-label" for="questao_1">
+          {{ questionario['questao_1'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_1 %}
+    {% for alternativa in questionario['questao_1'] %}
+    {% if alternativa not in pessoa.questao_1 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="questao_1"
+          value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_1">
+          {{ questionario['questao_1'][alternativa] }}
+      </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_1'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="questao_1"
+          value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_1">
+          {{ questionario['questao_1'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_2">
+            <strong>
+                2) Há quanto tempo vive na rua?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_2 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_2"
+            id="questao_2_{{ pessoa.questao_2 }}" value="{{ pessoa.questao_2 }}"
+            checked>
+        <label class="form-check-label" for="questao_2_{{ pessoa.questao_2 }}">
+            {{ questionario['questao_2'][pessoa.questao_2] }}
+        </label>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_2 %}
+    {% for alternativa in questionario['questao_2'] %}
+    {% if alternativa not in pessoa.questao_2 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_2"
+            id="questao_2_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_2_{{ alternativa }}">
+            {{ questionario['questao_2'][alternativa] }}
+        </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_2'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_2"
+            id="questao_2_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_2_{{ alternativa }}">
+            {{ questionario['questao_2'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_3">
+            <strong>
+                3) Quais os principais motivos pelos quais passou a morar na rua / albergue / outro? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_3 %}
+    {% for alternativa in pessoa.questao_3 %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox"
+              name="questao_3" value="{{ alternativa }}" checked>
+          <label class="form-check-label" for="questao_3">
+              {{ questionario['questao_3'][alternativa] }}
+          </label>
+        </div>
+    {% endfor %}
+    {% else %}
+        <div class="row">
+            <div class="col-sm-6">
+                <p style="color: red"><em>
+                    <strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+            </div>
+        </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_3 %}
+    {% for alternativa in questionario['questao_3'] %}
+    {% if alternativa not in pessoa.questao_3 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_3" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_3">
+          {{ questionario['questao_3'][alternativa] }}
+      </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_3'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_3" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_3">
+          {{ questionario['questao_3'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_4">
+            <strong>
+                4) Há quanto tempo mora na cidade atual?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_4 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_4"
+            id="questao_4_{{ pessoa.questao_4 }}"
+            value="{{ pessoa.questao_4 }}" checked>
+        <label class="form-check-label" for="questao_2_{{ pessoa.questao_4 }}">
+            {{ questionario['questao_4'][pessoa.questao_4] }}
+        </label>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_4 %}
+    {% for alternativa in questionario['questao_4'] %}
+    {% if alternativa not in pessoa.questao_4 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_4"
+            id="questao_4_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_4_{{ alternativa }}">
+            {{ questionario['questao_4'][alternativa] }}
+        </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_4'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_4"
+            id="questao_4_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_4_{{ alternativa }}">
+            {{ questionario['questao_4'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_5">
+            <strong>
+                5) Vive com sua família na rua?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_5 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_5"
+            id="questao_5_{{ pessoa.questao_5 }}"
+            value="{{ pessoa.questao_5 }}" checked>
+        <label class="form-check-label" for="questao_5_{{ pessoa.questao_5 }}">
+            {{ questionario['questao_5'][pessoa.questao_5] }}
+        </label>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_5 %}
+    {% for alternativa in questionario['questao_5'] %}
+    {% if alternativa not in pessoa.questao_5 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_5"
+            id="questao_5_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_5_{{ alternativa }}">
+            {{ questionario['questao_5'][alternativa] }}
+        </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_5'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_5"
+            id="questao_5_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_5_{{ alternativa }}">
+            {{ questionario['questao_5'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_6">
+            <strong>
+                6) Tem contato com parente que viva fora na rua?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_6 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_6"
+            id="questao_6_{{ pessoa.questao_6 }}"
+            value="{{ pessoa.questao_6 }}" checked>
+        <label class="form-check-label" for="questao_6_{{ pessoa.questao_6 }}">
+            {{ questionario['questao_6'][pessoa.questao_6] }}
+        </label>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_6 %}
+    {% for alternativa in questionario['questao_6'] %}
+    {% if alternativa not in pessoa.questao_6 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_6"
+            id="questao_6_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_6_{{ alternativa }}">
+            {{ questionario['questao_6'][alternativa] }}
+        </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_6'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_6"
+            id="questao_6_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_6_{{ alternativa }}">
+            {{ questionario['questao_6'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_7">
+                <strong>
+                7) Nos últimos 6 meses frequentou ou participou de alguma atividade comunitária? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_7 %}
+    {% for alternativa in pessoa.questao_7 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_7" value="{{ alternativa }}" checked>
+      <label class="form-check-label" for="questao_7">
+          {{ questionario['questao_7'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_7 %}
+    {% for alternativa in questionario['questao_7'] %}
+    {% if alternativa not in pessoa.questao_7 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_7" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_7">
+          {{ questionario['questao_7'][alternativa] }}
+      </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_7'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_7" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_7">
+          {{ questionario['questao_7'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_8">
+            <strong>
+                8) Nos últimos 6 meses foi atendido em algum dos lugares listados abaixo? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_8 %}
+    {% for alternativa in pessoa.questao_8 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_8" value="{{ alternativa }}" checked>
+      <label class="form-check-label" for="questao_8">
+          {{ questionario['questao_8'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_8 %}
+    {% for alternativa in questionario['questao_8'] %}
+    {% if alternativa not in pessoa.questao_8 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_8" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_8">
+          {{ questionario['questao_8'][alternativa] }}
+      </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_8'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_8" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_8">
+          {{ questionario['questao_8'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+            <label class="form-check-label" for="questao_9"><strong>
+                9) Alguma vez teve emprego com carteira de trabalho assinada?
+            </strong>
+            </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_9 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_9"
+            id="questao_9_{{ pessoa.questao_9 }}"
+            value="{{ pessoa.questao_9 }}" checked>
+        <label class="form-check-label" for="questao_9_{{ pessoa.questao_9 }}">
+            {{ questionario['questao_9'][pessoa.questao_9] }}
+        </label>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+    {% if pessoa.questao_9 %}
+    {% for alternativa in questionario['questao_9'] %}
+    {% if alternativa not in pessoa.questao_9 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_9"
+            id="questao_9_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_9_{{ alternativa }}">
+            {{ questionario['questao_9'][alternativa] }}
+        </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_9'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_9"
+            id="questao_9_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_9_{{ alternativa }}">
+            {{ questionario['questao_9'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+            <label class="form-check-label" for="questao_10"><strong>
+                10) O que faz para ganhar dinheiro? (admite múltipla marcação)
+            </strong>
+            </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_10 %}
+    {% for alternativa in pessoa.questao_10 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_10" value="{{ alternativa }}" checked>
+      <label class="form-check-label" for="questao_10_{{ alternativa }}">
+          {{ questionario['questao_10'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_10 %}
+    {% for alternativa in questionario['questao_10'] %}
+    {% if alternativa not in pessoa.questao_10 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_10" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_10">
+          {{ questionario['questao_10'][alternativa] }}
+      </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_10'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_10" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_10">
+          {{ questionario['questao_10'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_11">
+            <strong>
+                11) Qual valor renda mensal?
+            </strong>
+        </label>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-1">
+            <label for="questao_11">R$</label>
+        </div>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="questao_11"
+                name="questao_11" placeholder="Informe a renda"
+                value="{{ pessoa.questao_11 }}"/>
+        </div>
+    </div>
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_12">
+            <strong>
+                12) Quanto tempo faz que realizou exames médicos?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_12 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_12"
+            id="questao_12_{{ pessoa.questao_12 }}"
+            value="{{ pessoa.questao_12 }}" checked>
+        <label class="form-check-label" for="questao_12_{{ pessoa.questao_12 }}">
+            {{ questionario['questao_12'][pessoa.questao_12] }}
+        </label>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_12 %}
+    {% for alternativa in questionario['questao_12'] %}
+    {% if alternativa not in pessoa.questao_12 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_12"
+            id="questao_12_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_12_{{ alternativa }}">
+            {{ questionario['questao_12'][alternativa] }}
+        </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_12'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_12"
+            id="questao_12_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_12_{{ alternativa }}">
+            {{ questionario['questao_12'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_13">
+            <strong>
+                13) Possui alguma deficiência? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_13 %}
+    {% for alternativa in pessoa.questao_13 %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox"
+            name="questao_13" value="{{ alternativa }}" checked>
+      <label class="form-check-label" for="questao_13">
+          {{ questionario['questao_13'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_13 %}
+    {% for alternativa in questionario['questao_13'] %}
+    {% if alternativa not in pessoa.questao_13 %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_13" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_13 }}">
+          {{ questionario['questao_13'][alternativa] }}
+      </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_13'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_13" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_13 }}">
+          {{ questionario['questao_13'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_14">
+            <strong>
+                14) Já foi vacinado contra Covid-19?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% if pessoa.questao_14 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_14"
+            id="questao_14_{{ pessoa.questao_14 }}"
+            value="{{ pessoa.questao_14 }}" checked>
+        <label class="form-check-label" for="questao_14_{{ pessoa.questao_14 }}">
+            {{ questionario['questao_14'][pessoa.questao_14] }}
+        </label>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-sm-6">
+            <p style="color: red"><em><strong>*ATENÇÃO:</strong> Nenhuma alternativa selecionada!</em></p>
+        </div>
+    </div>
+    {% endif %}
+
+    <br>
+
+    {% if pessoa.questao_14 %}
+    {% for alternativa in questionario['questao_14'] %}
+    {% if alternativa not in pessoa.questao_14 %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_14"
+            id="questao_14_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_14_{{ alternativa }}">
+            {{ questionario['questao_14'][alternativa] }}
+        </label>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    {% for alternativa in questionario['questao_14'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_14"
+            id="questao_14_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_14_{{ alternativa }}">
+            {{ questionario['questao_14'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <div class="col-sm-">
+            <label for="obs_psr"><strong><em>Observaçôes referentes ao cadastro</em></strong></label>
+        </div>
+    </div>
+    <div class="row">
+            {% if pessoa.obs_psr %}
+            <textarea class="form-control" name="obs_psr" rows="4"
+            >{{ pessoa.obs_psr }}
+            </textarea>
+            {% else %}
+            <textarea class="form-control" name="obs_psr" rows="4"
+            ></textarea>
+            {% endif %}
+    </div>
+
+    <br>
+    <br>
+
+    </form>
+</div>
+
+{% endblock %}

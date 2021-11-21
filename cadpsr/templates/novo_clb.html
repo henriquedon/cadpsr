@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <form action="/persistencia_clb" method="POST">
+        <div class="row">
+            <div class="col-sm-10">
+                <h5>{{ titulo_body_1 }}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-10">
+                <h2>{{ titulo_body_2 }}</h2>
+            </div>
+            <div class="col-sm-1">
+                <a class="btn btn-outline-dark" href="\colaboradores"
+                    role="button">Voltar</a>
+            </div>
+            <div class="col-sm-1">
+                <button type="submit" class="btn btn-outline-success"
+                    id="salvar" name="salvar"  value="">Salvar</button>
+            </div>
+        </div>
+
+    <hr>
+
+    <small><em>*É obrigatório o preenchimento em campos com *. No campo CPF utilize apenas números.</em></small>
+    <br>
+    <br>
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-6">
+            <label for="nome_civil">*Nome Civil</label>
+            <input type="text" class="form-control" id="nome_civil" name="nome_civil"
+            placeholder="Informe o nome civil" required/>
+        </div>
+        <div class="col-sm-3">
+            <label for="cpf">*CPF (apenas números)</label>
+            <input type="text" class="form-control" id="cpf" name="cpf"
+                placeholder="apenas nº" required/>
+        </div>
+    </div>
+    <br>
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-6">
+            <label for="nome_social">Nome Social</label>
+            <input type="text" class="form-control" id="nome_social" name="nome_social"
+            placeholder="Informe o nome social"/>
+        </div>
+        <div class="col-sm-4">
+            <label for="data_nascimento">*Data de Nascimento (apenas números)</label>
+            <input class="form-control" id="data_nascimento" type="date"
+            name="data_nascimento" min="1921-01-01" max="2004-11-01" required/>
+        </div>
+    </div>
+    <br>
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-5">
+            <label for="email">*E-mail</label>
+            <input type="email" class="form-control" id="email"
+                name="email" placeholder="Informe o e-mail" required/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-3">
+            <label for="tipo_clb">*Tipo</label>
+        </div>
+        <div class="col-sm-5">
+            <label for="lotacao">*Lotação</label>
+        </div>
+    </div>
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-3">
+            <select class="form-select" name="tipo_clb" id="tipo_clb"
+                required>
+                {% if current_user.tipo_clb == 'GERENTE' %}
+                <option value="COLABORADOR(A)" selected>COLABORADOR(A)</option>
+                {% else %}
+                <option selected></option>
+                <option value="COLABORADOR(A)">COLABORADOR(A)</option>
+                <option value="GERENTE">GERENTE</option>
+                {% endif %}
+            </select>
+        </div>
+
+        <div class="col-sm-4">
+            <select class="form-select" name="lotacao"
+                id="lotacao" required>
+                {% if current_user.tipo_clb == 'GERENTE' %}
+                <option value="{{ current_user.lotacao }}" selected
+                >{{ campos_cad['entidades'][current_user.lotacao] }}
+                </option>
+                {% else %}
+                <option selected></option>
+                {% for lotacao in campos_cad['entidades'] %}
+                {% if lotacao != '5' %}
+                <option value="{{ lotacao }}">
+                    {{ campos_cad['entidades'][lotacao] }}
+                </option>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+
+    </div>
+    <br>
+    <br>
+    <br>
+    </form>
+</div>
+{% endblock %}

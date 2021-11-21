@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-11">
+            <h5>{{ titulo }}</h5>
+        </div>
+    </div>
+
+    <form method="POST">
+
+    <div class="row">
+        <div class="col-sm-10">
+            <h2>{{ colaborador.nome_social }}</h2>
+        </div>
+        {% if current_user.status == 'INICIO' or current_user.status == 'REDEF' %}
+        <div class="col-sm-1">
+        </div>
+        {% else %}
+        <div class="col-sm-1">
+            <a class="btn btn-outline-dark" href="/index.html" role="button">Voltar</a>
+        </div>
+        {% endif %}
+        <div class="col-sm-1">
+            <button type="submit" class="btn btn-outline-success" id="salvar"
+                name="Salvar" value="">Salvar</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-sm-11">
+            <h5>{{ subtitulo }}</h5>
+        </div>
+        <div class="row">
+          <div class="col-sm-10">
+            <small><em><strong>*Atenção:</strong> a senha precisa conter no mínimo 10 dígitos.</em></small>
+          </div>
+        </div>
+    </div>
+        <br>
+        <div class="row">
+            <div class="col-md-4">
+                <label for="senha_atual">Senha Atual</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <input type="password" class="form-control" id="senha_atual"
+                    name="senha_atual" placeholder="Informe sua senha atual"
+                    required/>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-5">
+                <label for="senha_nova">Nova senha</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <input type="password" class="form-control" id="senha_nova"
+                    name="senha_nova" placeholder="Digite a nova senha" required/>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="row">
+            <div class="col-md-5">
+                <label for="senha_confirmacao">Confirmação de senha</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <input type="password" class="form-control" id="senha_confirmacao"
+                    name="senha_confirmacao"
+                    placeholder="Confirme a nova senha" required/>
+            </div>
+        </div>
+
+        <div class="row">
+
+        </div>
+        <br>
+    </form>
+</div>
+{% endblock %}

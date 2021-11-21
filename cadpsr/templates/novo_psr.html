@@ -1,0 +1,734 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+<form action="/persistencia_psr" method="POST">
+    <div class="row">
+        <div class="col-sm-10">
+            <h5>{{ titulo_body_1 }}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-10">
+            <h2>{{ titulo_body_2 }}</h2>
+        </div>
+        <div class="col-sm-1">
+            <a class="btn btn-outline-dark" href="\pessoas"
+                role="button">Voltar</a>
+        </div>
+        <div class="col-sm-1">
+            <button type="submit" class="btn btn-outline-success"
+                id="salvar" name="salvar"  value="">Salvar</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <small><em>*É obrigatório o preenchimento em campos com *. Nos campos de documentos utilize apenas números.</em></small>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-sm-6">
+            <label for="nome_civil">*Nome Civil</label>
+            <input type="text" class="form-control" id="nome_civil" name="nome_civil"
+            placeholder="Informe o nome civil " required/>
+        </div>
+        <div class="col-sm-3">
+            <label for="cpf">*CPF (apenas números)</label>
+            <input type="text" class="form-control" id="cpf" name="cpf"
+                placeholder="Informe o CPF" required/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <label for="nome_social">Nome Social</label>
+            <input type="text" class="form-control" id="nome_social"
+                name="nome_social" placeholder="Informe o nome social"/>
+        </div>
+        <div class="col-sm-4">
+            <label for="data_nascimento">*Data de Nascimento (apenas números)</label>
+            <input class="form-control" id="data_nascimento" type="date"
+            name="data_nascimento"
+            min="1921-01-01" max="2021-12-01" required/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="apelido">Apelido</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="cidade_atual">*Cidade atual</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="entidade_referencia">*Entidade Referência</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="apelido"
+            name="apelido"
+            placeholder="Informe o apelido"/>
+        </div>
+        <div class="col-sm-4">
+            <select class="form-select" name="cidade_atual" id="cidade_atual"
+                {{ estado }} required>
+                <option selected></option>
+                {% for cidade_atual in campos_cad['cidades'] %}
+                <option value="{{ cidade_atual }}">
+                    {{ campos_cad['cidades'][cidade_atual].upper() }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <select class="form-select" name="entidade_referencia"
+                id="entidade_referencia" required>
+                <option selected></option>
+                {% for entidade_referencia in campos_cad['entidades'] %}
+                {% if entidade_referencia != '5' %}
+                <option value="{{ entidade_referencia }}">
+                    {{ campos_cad['entidades'][entidade_referencia] }}
+                </option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-5">
+            <label for="Nome">E-mail</label>
+            <input type="text" class="form-control" id="email"
+                name="email" placeholder="Informe o e-mail"/>
+        </div>
+        <div class="col-sm-2">
+            <label for="telefone">Telefone</label>
+            <input type="text" class="form-control" id="telefone"
+                name="telefone" placeholder="Informe o telefone"/>
+        </div>
+        <div class="col-sm-2">
+            <label for="celular">Celular</label>
+            <input type="text" class="form-control" id="celular"
+                name="celular" placeholder="Informe o celular"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="etnia">Raça / Etnia</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="sexo">Sexo</label>
+        </div>
+        <div class="col-sm-3">
+            <label for="orientacao_sexual">Orientação Sexual</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="identidade_genero">Identidade de Gênero</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <select class="form-select" name="etnia" id="etnia">
+                <option selected></option>
+                {% for etnia in campos_cad['etnias'] %}
+                <option value="{{ etnia }}">
+                    {{ campos_cad['etnias'][etnia].upper() }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <select class="form-select" name="sexo" id="sexo">
+                <option selected></option>
+                {% for sexo in campos_cad['sexos'] %}
+                <option value="{{ sexo }}">
+                    {{ campos_cad['sexos'][sexo].upper() }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <select class="form-select"
+                name="orientacao_sexual" id="orientacao_sexual">
+                <option selected></option>
+                {% for orientacao_sexual in campos_cad['orientacoes_sexual'] %}
+                <option value="{{ orientacao_sexual }}">
+                    {{ campos_cad['orientacoes_sexual'][orientacao_sexual].upper() }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <select class="form-select"
+                name="identidade_genero" id="identidade_genero">
+                <option selected></option>
+                {% for identidade_genero in campos_cad['identidades_genero'] %}
+                <option value="{{ identidade_genero }}">
+                    {{ campos_cad['identidades_genero'][identidade_genero].upper() }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="row">
+        <div class="col-sm-2">
+            <label for="rg">RG</label>
+        </div>
+        <div class="col-sm-1">
+            <label for="rg_uf">UF</label>
+        </div>
+        <div class="col-sm-3">
+            <label for="rg_emissao">Data de Emissão RG</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="rg_emissor">Órgão Emissor</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <input type="text" class="form-control"
+                id="rg" name="rg" placeholder="Informe o RG"/>
+        </div>
+        <div class="col-sm-1">
+            <select class="form-select" name="rg_uf" id="rg_uf">
+                <option selected></option>
+                {% for uf in campos_cad['uf_s'] %}
+                <option value="{{ uf }}">{{ campos_cad['uf_s'][uf] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <input class="form-control" id="rg_emissao" type="date"
+                name="rg_emissao"
+                min="1921-01-01" max="2021-12-01"/>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="rg_emissor"
+                name="rg_emissor" placeholder="Informe o Órgão Emissor"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-2">
+            <label for="titulo_eleitor">Título de Eleitor</label>
+            <input type="text" class="form-control" id="titulo_eleitor"
+                name="titulo_eleitor" placeholder="Informe o Título"/>
+        </div>
+        <div class="col-sm-1">
+            <label for="titulo_zona">Zona</label>
+            <input type="text" class="form-control" id="titulo_zona"
+                name="titulo_zona"placeholder="Zona Eleitoral"/>
+        </div>
+        <div class="col-sm-2">
+            <label for="titulo_secao">Seção</label>
+            <input type="text" class="form-control" id="titulo_secao"
+                name="titulo_secao" placeholder="Seção Eleitoral"/>
+        </div>
+        <div class="col-sm-3">
+            <label for="titulo_emissao">Data de Emissão Título</label>
+            <input class="form-control" id="titulo_emissao" type="date"
+                name="titulo_emissao"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="cns">CNS</label>
+            <input type="text" class="form-control" id="cns"
+                name="cns" placeholder="Informe o CNS"/>
+        </div>
+        <div class="col-sm-2">
+            <label for="nis">NIS</label>
+            <input type="text" class="form-control" id="nis"
+                name="nis" placeholder="Informe o NIS"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <label for="certidao_nascimento">Certidão de Nascimento</label>
+        </div>
+        <div class="col-sm-3">
+            <label for="naturalidade">Naturalidade</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="nacionalidade">Nacionalidade</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="certidao_nascimento"
+            name="certidao_nascimento" placeholder="Informe o nº da Certidão..."/>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="naturalidade" name="naturalidade"
+                placeholder="Informe a naturalidade"/>
+        </div>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="nacionalidade" name="nacionalidade"
+                placeholder="Informe a nacionalidade"/>
+        </div>
+    </div>
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="row">
+            <label class="form-check-label" for="questao_migracao"><strong>
+                Está em situação de migração/refúgio por motivos: de guerra; políticos; ou econômicos relativos ao País de origem?
+            </strong>
+            </label>
+    </div>
+    <br>
+    {% for alternativa in campos_cad['questao_migracao'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_migracao"
+            id="questao_migracao_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_migracao_{{ alternativa }}">
+            {{ campos_cad['questao_migracao'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <div class="col-sm-5">
+            <label for="crnm">Carteira de Registro Nacional Migratório (CRNM)</label>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-2">
+            <label for="crnm_rnm">RNM</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="crnm_filiacao_a">Filiação</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="crnm_filiacao_b">Filiação</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="crnm_rnm"
+            name="crnm_rnm" placeholder="Informe o RNM"/>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="crnm_filiacao_a"
+            name="crnm_filiacao_a" placeholder="Informe a filiação"/>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="crnm_filiacao_b"
+            name="crnm_filiacao_b" placeholder="Informe a filiação"/>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="crnm_validade">Validade</label>
+        </div>
+        <div class="col-sm-2">
+            <label for="crnm_classificacao">Classificação</label>
+        </div>
+        <div class="col-sm-4">
+            <label for="crnm_domicilio">Domicílio</label>
+        </div>
+        <div class="col-sm-3">
+            <label for="crnm_emissao">Emissão</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <input class="form-control" id="crnm_validade" type="date"
+                name="crnm_validade"/>
+        </div>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="crnm_classificacao" name="crnm_classificacao"
+                placeholder="Informe a classificação"/>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="crnm_domicilio" name="crnm_domicilio"
+                placeholder="Informe o domicílio"/>
+        </div>
+        <div class="col-sm-3">
+            <input class="form-control" id="crnm_emissao" type="date"
+                name="crnm_emissao"/>
+        </div>
+    </div>
+
+    <br>
+
+    <br>
+    <br>
+    <br>
+
+    <h2>Questionário</h2>
+
+    <hr>
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label for="questao_1">
+            <strong>
+                1) Onde costuma dormir? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_1'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_1" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_1">
+          {{ questionario['questao_1'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_2">
+            <strong>
+                2) Há quanto tempo vive na rua?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_2'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_2"
+            id="questao_2_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_2_{{ alternativa }}">
+            {{ questionario['questao_2'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_3">
+            <strong>
+                3) Quais os principais motivos pelos quais passou a morar na rua / albergue / outro? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_3'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_3" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_3">
+          {{ questionario['questao_3'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_4">
+            <strong>
+                4) Há quanto tempo mora na cidade atual?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_4'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_4"
+            id="questao_4_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_4_{{ alternativa }}">
+            {{ questionario['questao_4'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_5">
+            <strong>
+                5) Vive com sua família na rua?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_5'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_5"
+            id="questao_5_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_5_{{ alternativa }}">
+            {{ questionario['questao_5'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_6">
+            <strong>
+                6) Tem contato com parente que viva fora na rua?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_6'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_6"
+            id="questao_6_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_6_{{ alternativa }}">
+            {{ questionario['questao_6'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_7">
+                <strong>
+                7) Nos últimos 6 meses frequentou ou participou de alguma atividade comunitária? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_7'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_7" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_7">
+          {{ questionario['questao_7'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_8">
+            <strong>
+                8) Nos últimos 6 meses foi atendido em algum dos lugares listados abaixo? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_8'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_8" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_8">
+          {{ questionario['questao_8'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+            <label class="form-check-label" for="questao_9"><strong>
+                9) Alguma vez teve emprego com carteira de trabalho assinada?
+            </strong>
+            </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_9'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_9"
+            id="questao_9_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_9_{{ alternativa }}">
+            {{ questionario['questao_9'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+            <label class="form-check-label" for="questao_10"><strong>
+                10) O que faz para ganhar dinheiro? (admite múltipla marcação)
+            </strong>
+            </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_10'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_10" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_10">
+          {{ questionario['questao_10'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_11">
+            <strong>
+                11) Qual valor renda mensal?
+            </strong>
+        </label>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-1">
+            <label for="questao_11">R$</label>
+        </div>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="questao_11"
+                name="questao_11" placeholder="Informe a renda"/>
+        </div>
+    </div>
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_12">
+            <strong>
+                12) Quanto tempo faz que realizou exames médicos?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_12'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_12"
+            id="questao_12_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_12_{{ alternativa }}">
+            {{ questionario['questao_12'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_13">
+            <strong>
+                13) Possui alguma deficiência? (admite múltipla marcação)
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_13'] %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox"
+          name="questao_13" value="{{ alternativa }}">
+      <label class="form-check-label" for="questao_13 }}">
+          {{ questionario['questao_13'][alternativa] }}
+      </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <label class="form-check-label" for="questao_14">
+            <strong>
+                14) Já foi vacinado contra Covid-19?
+            </strong>
+        </label>
+    </div>
+
+    <br>
+
+    {% for alternativa in questionario['questao_14'] %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="questao_14"
+            id="questao_14_{{ alternativa }}" value="{{ alternativa }}">
+        <label class="form-check-label" for="questao_14_{{ alternativa }}">
+            {{ questionario['questao_14'][alternativa] }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <br>
+    <br>
+
+    <div class="row">
+        <div class="col-sm-">
+            <label for="obs_psr"><strong><em>Observaçôes referentes ao cadastro</em></strong></label>
+        </div>
+    </div>
+    <div class="row">
+            <textarea class="form-control" id="obs_psr" name="obs_psr"
+                rows="4"></textarea>
+    </div>
+
+    <br>
+    <br>
+
+    </form>
+</div>
+
+{% endblock %}

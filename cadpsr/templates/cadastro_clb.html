@@ -1,0 +1,207 @@
+{% extends "/./base.html" %}
+{% block content %}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-10">
+            <h5>{{ titulo }}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-9">
+            <h2>{{ colaborador.nome_social }}</h2>
+        </div>
+        {% if current_user.tipo_clb == 'GESTOR' %}
+            {% if colaborador.status == 'INATIVO' %}
+                <div class="col-sm-1">
+                <form action="/status_clb/{{ colaborador.id }}" method="POST">
+                    <button type="submit" class="btn btn-outline-success">
+                        &nbsp;Ativar&nbsp;
+                    </button>
+                </form>
+                </div>
+            {% else %}
+                <div class="col-sm-1">
+                <form action="/status_clb/{{ colaborador.id }}" method="POST">
+                    <button type="submit" class="btn btn-outline-secondary">
+                        Inativar
+                    </button>
+                </form>
+                </div>
+            {% endif %}
+        <div class="col-sm-1">
+            <a class="btn btn-outline-primary"
+                href="/edicao_clb/{{ colaborador.id }}" role="button">
+                &nbsp;Editar&nbsp;
+            </a>
+        </div>
+        <div class="col-sm-1">
+            <a class="btn btn-outline-dark" href="/colaboradores"
+                role="button">
+                &nbsp;Voltar&nbsp;
+            </a>
+        </div>
+        {% endif %}
+        {% if current_user.tipo_clb == 'GERENTE' and current_user.lotacao == colaborador.lotacao %}
+            {% if colaborador.status == 'INATIVO' %}
+            <div class="col-sm-1">
+            <form action="/status_clb/{{ colaborador.id }}" method="POST">
+                <button type="submit" class="btn btn-outline-success">
+                    &nbsp;Ativar&nbsp;
+                </button>
+            </form>
+            </div>
+            <div class="col-sm-1">
+            </div>
+            {% elif colaborador.status == 'ATIVO'
+            or colaborador.status == 'REDEF'
+            or colaborador.status == 'INICIO' %}
+            <div class="col-sm-1">
+            <form action="/status_clb/{{ colaborador.id }}" method="POST">
+                <button type="submit" class="btn btn-outline-secondary">
+                    Inativar
+                </button>
+            </form>
+            </div>
+            {% else %}
+            <div class="col-sm-1">
+
+            </div>
+            {% endif %}
+            {% if colaborador.status == 'ATIVO' %}
+            <div class="col-sm-1">
+                <a class="btn btn-outline-primary"
+                    href="/edicao_clb/{{ colaborador.id }}" role="button">
+                    &nbsp;Editar&nbsp;
+                </a>
+            </div>
+            {% else %}
+            <div class="col-sm-1">
+
+            </div>
+            {% endif %}
+            <div class="col-sm-1">
+                <a class="btn btn-outline-dark" href="/colaboradores"
+                    role="button">
+                    &nbsp;Voltar&nbsp;
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <hr>
+    <div class="row">
+        <div class="col-sm-6">
+            <small><em><strong>Cadastro efetuado em:</strong> {{ data_criacao }}</em></small>
+        </div>
+        <div class="col-sm-5">
+            <small><em><strong>Atualizado em:</strong> {{ data_atualizacao }}</em></small>
+        </div>
+        {% if current_user.tipo_clb == 'GESTOR' %}
+        <div class="col-sm-1">
+            <form action="/exclusao_clb/{{ colaborador.id }}" method="POST">
+                <button type="submit"
+                    class="btn btn-outline-danger">Excluir
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-1">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+            value="{{ colaborador.id }}" disabled/>
+        </div>
+        <div class="col-sm-2">
+            <label for="status">STATUS</label>
+            <input type="text" class="form-control" status="status" name="status"
+            value="{{ colaborador.status }}" disabled/>
+        </div>
+    </div>
+    <br>
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-6">
+            <label for="id">*Nome Civil</label>
+            <input type="text" class="form-control" id="id" name="id"
+            placeholder="Informe o nome civil" value="{{ colaborador.nome_civil }}" disabled/>
+        </div>
+        <div class="col-sm-3">
+            <label for="cpf">*CPF</label>
+            <input type="text" class="form-control" id="cpf" name="cpf"
+                placeholder="apenas nº" value="{{ colaborador.cpf }}" disabled/>
+        </div>
+    </div>
+    <br>
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-6">
+            <label for="nome_social">Nome Social</label>
+            <input type="text" class="form-control" id="nome_social" name="nome_social"
+            placeholder="Informe o nome social" value="{{ colaborador.nome_social }}" disabled/>
+        </div>
+        <div class="col-sm-3">
+            <label for="data_nascimento">*Data de Nascimento*</label>
+            <input class="form-control" id="data_nasc" type="date"
+                name="data_nasc" min="1921-01-01" max="2004-11-01"
+                value="{{ colaborador.data_nascimento }}" disabled/>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-5">
+            <label for="email">*E-mail</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <input type="email" class="form-control" id="email"
+                name="email" placeholder="Informe o e-mail" value="{{ colaborador.email }}" disabled/>
+        </div>
+        <div class="col-sm-2">
+        </div>
+        {% if current_user == colaborador or colaborador.status == 'INATIVO'
+        or current_user.tipo_clb == 'GERENTE' and colaborador.status == 'REDEF' %}
+        <div class="col-sm-3">
+        </div>
+        {% else %}
+        <div class="col-sm-3">
+        <form action="/redefinicao_senha/{{ colaborador.id }}" method="POST">
+            <button type="submit" class="btn btn-outline-dark">
+                Redefinir Senha
+            </button>
+        </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <br>
+
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-3">
+            <label for="tipo_clb">Tipo</label>
+        </div>
+        <div class="col-sm-5">
+            <label for="lotacao">Lotação</label>
+        </div>
+    </div>
+    <div class="row gx-3 gy-2 align-items-center">
+        <div class="col-sm-3">
+            <select class="form-control" name="tipo_clb" id="tipo_clb"
+                disabled>
+                <option value="{{ colaborador.tipo_clb }}" selected>{{ colaborador.tipo_clb }}</option>
+            </select>
+        </div>
+        <div class="col-sm-5">
+            <select class="form-control" name="lotacao" id="lotacao" disabled>
+                <option value="{{ colaborador.lotacao }}" selected>{{ campos_cad['entidades'][colaborador.lotacao] }}</option>
+            </select>
+        </div>
+        <br>
+    </div>
+    <br>
+<br>
+<br>
+</div>
+{% endblock %}
