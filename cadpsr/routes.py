@@ -75,7 +75,7 @@ def index():
         flash('Para acessar outras áreas do sistema, você precisa alterar sua senha!', category='error')
         return redirect('perfil')
 
-    cadpsr_versao = 'Ver. 1.4.1'
+    cadpsr_versao = 'Ver. 1.5'
 
     return render_template("index.html", titulo='Home :: CadPSR', cadpsr_versao=cadpsr_versao,
                                                                   campos_cad=campos_cad)
@@ -111,7 +111,8 @@ def colaboradores():
             if dado == '.acesso' or dado == '.acesso1' or dado == '.acesso2' or dado == '.acesso3' or dado == '.acesso4':
                 if current_user.tipo_clb == 'GESTOR':
                     if dado == '.acesso':
-                        acessos = Acesso.query.all()
+                        acessos = Acesso.query.order_by(Acesso.id_acesso.desc()).all()
+                        #acessos = Acesso.query.all()
                     else:
                         acessos = Acesso.query.filter_by(lotacao_clb=dado[7]).all()
 
@@ -161,6 +162,7 @@ def colaboradores():
                                                               )
             if campo == 'NOME':
                 colaborador = Colaborador.query.filter(Colaborador.nome_civil.like('%' + dado + '%')).first()
+                
             elif campo == 'ID':
                 if dado.isdigit():
                     colaborador = Colaborador.query.filter_by(id=int(dado)).first()
@@ -250,6 +252,7 @@ def pessoas():
                 pessoas = None
                 if current_user.tipo_clb == 'GESTOR':
                     if dado == '.t':
+                        #pessoas = Pessoa.query.order_by(Pessoa.id.desc()).all()
                         pessoas = Pessoa.query.all()
                     else:
                         pessoas = Pessoa.query.filter_by(entidade_referencia=dado[2]).all()
@@ -417,7 +420,6 @@ def edicao_clb(clb_id):
         return redirect(url_for('colaboradores'))
 
     titulo = 'Dados Cadastrais - Colaborador'
-    estado = ''
 
     if current_user.tipo_clb == 'GERENTE' and current_user.lotacao != colaborador.lotacao:
         flash('Acesso negado.', category='error')
@@ -436,21 +438,6 @@ def edicao_clb(clb_id):
 
         cpf = request.form.get('cpf')
         email = request.form.get('email')
-
-        # Verifica se existe CPF cadastrado em outro cadastro!
-        verifica_cpf = Colaborador.query.filter_by(cpf=cpf).first()
-        if verifica_cpf and verifica_cpf.id != colaborador.id:
-            flash(
-                f'Falha ao atualizar o cadastro. CPF já cadastrado. ID correspondente: {colaborador.id}', category='error')
-            return redirect('/colaboradores')
-
-        # Verifica se existe se o E-mail está cadastrado em outro cadastro!
-        verifica_email = Colaborador.query.filter_by(email=email).first()
-        if verifica_email and verifica_email.id != colaborador.id:
-            flash(
-                f'Falha ao atualizar o cadastro. E-mail já cadastrado. ID correspondente: {colaborador.id}', category='error')
-            return redirect('/colaboradores')
-
         nome_civil = request.form.get('nome_civil')
         nome_social = request.form.get('nome_social')
         if nome_social is None or nome_social == '':
@@ -459,17 +446,51 @@ def edicao_clb(clb_id):
         email = request.form.get('email')
         tipo_clb = request.form.get('tipo_clb')
         lotacao = request.form.get('lotacao')
-        data_atualizacao = now(
-            'America/Sao_Paulo').format('DD-MM-YYYY-HH-mm-ss')
         modificado_por = current_user.id
+
+        # VERIFICAÇÃO DE ENTRADA DE DADOS
+
+        if nome_civil is not None:
+            if len(nome_civil) > 60:
+                flash('O campo Nome Civil não pode conter mais de  caracteres.', category='error')
+                return redirect('/novo_clb')
+
+        if nome_social is not None:
+            if len(nome_social) > 60:
+                flash('O campo Nome Social não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_clb')
+
+        if data_nascimento is not None:
+            if len(data_nascimento) > 10:
+                flash('O campo "Data de Nascimento" não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_clb')
+
+        if email is not None:
+            if len(email) > 60:
+                flash('O campo E-mail não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_clb')
 
         if len(email) < 4:
             flash('E-mail inválido.', category='error')
             return redirect(f'/edicao_clb/{clb_id}')
 
-        elif len(nome_civil) < 2:
+        if len(nome_civil) < 2:
             flash('Nome curto demais.', category='error')
             return redirect(f'/edicao_clb/{clb_id}')
+
+        # VERIFICAÇÃO DE DUPLICAÇÃO NA BASE DADOS
+
+        # Verifica se existe CPF cadastrado em outro cadastro!
+        verifica_cpf = Colaborador.query.filter_by(cpf=cpf).first()
+        if verifica_cpf and verifica_cpf.id != colaborador.id:
+            flash(f'Falha ao atualizar o cadastro. CPF já cadastrado. ID correspondente: {colaborador.id}', category='error')
+            return redirect('/colaboradores')
+
+        # Verifica se existe se o E-mail está cadastrado em outro cadastro!
+        verifica_email = Colaborador.query.filter_by(email=email).first()
+        if verifica_email and verifica_email.id != colaborador.id:
+            flash(f'Falha ao atualizar o cadastro. E-mail já cadastrado. ID correspondente: {colaborador.id}', category='error')
+            return redirect('/colaboradores')
 
         colaborador = Colaborador.query.get(clb_id)
         colaborador.nome_civil = nome_civil
@@ -478,7 +499,7 @@ def edicao_clb(clb_id):
         colaborador.email = email
         colaborador.tipo_clb = tipo_clb
         colaborador.lotacao = lotacao
-        colaborador.data_atualizacao = data_atualizacao
+        colaborador.data_atualizacao = now('America/Sao_Paulo').format('DD-MM-YYYY-HH-mm-ss')
         colaborador.modificado_por = modificado_por
 
         db.session.commit()
@@ -541,6 +562,145 @@ def edicao_psr(psr_id):
         nis = request.form.get('nis')
         certidao_nascimento = request.form.get('certidao_nascimento')
         crnm_rnm = request.form.get('crnm_rnm')
+
+        # VALIDAÇÕES DE CAMPOS DE ENTRADA
+
+        if nome_civil is not None:
+            if len(nome_civil) > 60:
+                flash('O campo Nome Civil não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if nome_social is not None:
+            if len(nome_social) > 60:
+                flash('O campo Nome Social não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('apelido') is not None:
+            if len(request.form.get('apelido')) > 60:
+                flash('O campo Apelido não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('email') is not None:
+            if len(request.form.get('email')) > 60:
+                flash('O campo E-mail não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('telefone') is not None:
+            if len(request.form.get('telefone')) > 15:
+                flash('O campo Telefone não pode conter mais de 15 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('celular') is not None:
+            if len(request.form.get('celular')) > 15:
+                flash('O campo Celular não pode conter mais de 15 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('rg') is not None:
+            if len(request.form.get('rg')) > 16:
+                flash('O campo RG não pode conter mais de 16 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('rg_emissao') is not None:
+            if len(request.form.get('rg_emissao')) > 10:
+                flash('O campo RG Emissão não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('rg_orgao_emissor') is not None:
+            if len(request.form.get('rg_orgao_emissor')) > 60:
+                flash('O campo RG Órgão Emissor não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('titulo_eleitor') is not None:
+            if len(request.form.get('titulo_eleitor')) > 12:
+                flash('O campo Título de Eleitor não pode conter mais de 12 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('titulo_zona') is not None:
+            if len(request.form.get('titulo_zona')) > 6:
+                flash('O campo Zona (Título de Eleitor) não pode conter mais de 6 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('titulo_secao') is not None:
+            if len(request.form.get('titulo_secao')) > 6:
+                flash('O campo Seção (Título de Eleitor) não pode conter mais de 6 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('titulo_emissao') is not None:
+            if len(request.form.get('titulo_emissao')) > 10:
+                flash('O campo Emissão (Título de Eleitor) não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('cns') is not None:
+            if len(request.form.get('cns')) > 15:
+                flash('O campo CNS não pode conter mais de 15 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('nis') is not None:
+            if len(request.form.get('nis')) > 12:
+                flash('O campo NIS não pode conter mais de 12 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('certidao_nascimento') is not None:
+            if len(request.form.get('certidao_nascimento')) > 32:
+                flash('O campo Certidão Nascimento não pode conter mais de 32 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('naturalidade') is not None:
+            if len(request.form.get('naturalidade')) > 60:
+                flash('O campo Naturalidade não pode conter mais de 30 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('nacionalidade') is not None:
+            if len(request.form.get('nacionalidade')) > 30:
+                flash('O campo Nascionalidade não pode conter mais de 30 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_rnm') is not None:
+            if len(request.form.get('crnm_rnm')) >  20:
+                flash('O campo CRNM não pode conter mais de 20 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_filiacao_a') is not None:
+            if len(request.form.get('crnm_filiacao_a')) > 60:
+                flash('O campo Filiação (a) não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_filiacao_b') is not None:
+            if len(request.form.get('crnm_filiacao_b')) > 60:
+                flash('O campo Filiação (b) não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_validade') is not None:
+            if len(request.form.get('crnm_validade')) > 10:
+                flash('O Validade (CRNM) não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_classificacao') is not None:
+            if len(request.form.get('crnm_classificacao')) > 30:
+                flash('O Classificação (CRNM) não pode conter mais de 30 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_domicilio') is not None:
+            if len(request.form.get('crnm_domicilio')) > 100:
+                flash('O campo Domicílio (CRNM) não pode conter mais de 100 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_emissao') is not None:
+            if len(request.form.get('crnm_emissao')) > 10:
+                flash('O Emissão (CRNM) não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('questao_11') is not None:
+            if len(request.form.get('questao_11')) > 12:
+                flash('O campo referente à renda da Questão 11 não pode conter mais de 12 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('obs_psr') is not None:
+            if len(request.form.get('obs_psr')) > 500:
+                flash('O campo Observação não pode conter mais de 500 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        # VERIFICAÇÃO DE DUPLICAÇÃO DE DOCUMENTOS NA BASE DE DADOS
 
         doc = Pessoa.query.filter_by(rg=rg).first()  # Verifica RG
         if pessoa.rg is not None and pessoa.rg != '' and doc.rg is not None and doc.rg != '':
@@ -805,7 +965,11 @@ def perfil():
             return redirect('/perfil')
 
         if len(senha_nova) < 10:
-            flash('A senha precisa conter no mínimo 12 dígitos.', category='error')
+            flash('A senha precisa conter no mínimo 10 dígitos.', category='error')
+            return redirect('/perfil')
+
+        if len(senha_nova) > 64:
+            flash('A senha não pode conter mais de 64 caracteres.', category='error')
             return redirect('/perfil')
 
         senha_hash = generate_password_hash(senha_nova)
@@ -855,6 +1019,146 @@ def persistencia_psr():
         certidao_nascimento = request.form.get('certidao_nascimento')
         crnm_rnm = request.form.get('crnm_rnm')
 
+        # VALIDAÇÕES DOS CAMPOS DE ENTRADA
+
+        if nome_civil is not None:
+            if len(nome_civil) > 60:
+                flash('O campo Nome Civil não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if nome_social is not None:
+            if len(nome_social) > 60:
+                flash('O campo Nome Social não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('apelido') is not None:
+            if len(request.form.get('apelido')) > 60:
+                flash('O campo Apelido não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('email') is not None:
+            if len(request.form.get('email')) > 60:
+                flash('O campo E-mail não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('telefone') is not None:
+            if len(request.form.get('telefone')) > 15:
+                flash('O campo Telefone não pode conter mais de 15 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('celular') is not None:
+            if len(request.form.get('celular')) > 15:
+                flash('O campo Celular não pode conter mais de 15 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('rg') is not None:
+            if len(request.form.get('rg')) > 16:
+                flash('O campo RG não pode conter mais de 16 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('rg_emissao') is not None:
+            if len(request.form.get('rg_emissao')) > 10:
+                flash('O campo RG Emissão não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('rg_orgao_emissor') is not None:
+            if len(request.form.get('rg_orgao_emissor')) > 60:
+                flash('O campo RG Órgão Emissor não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('titulo_eleitor') is not None:
+            if len(request.form.get('titulo_eleitor')) > 12:
+                flash('O campo Título de Eleitor não pode conter mais de 12 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('titulo_zona') is not None:
+            if len(request.form.get('titulo_zona')) > 6:
+                flash('O campo Zona (Título de Eleitor) não pode conter mais de 6 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('titulo_secao') is not None:
+            if len(request.form.get('titulo_secao')) > 6:
+                flash('O campo Seção (Título de Eleitor) não pode conter mais de 6 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('titulo_emissao') is not None:
+            if len(request.form.get('titulo_emissao')) > 10:
+                flash('O campo Emissão (Título de Eleitor) não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('cns') is not None:
+            if len(request.form.get('cns')) > 15:
+                flash('O campo CNS não pode conter mais de 15 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('nis') is not None:
+            if len(request.form.get('nis')) > 12:
+                flash('O campo NIS não pode conter mais de 12 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('certidao_nascimento') is not None:
+            if len(request.form.get('certidao_nascimento')) > 32:
+                flash('O campo Certidão Nascimento não pode conter mais de 32 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('naturalidade') is not None:
+            if len(request.form.get('naturalidade')) > 60:
+                flash('O campo Naturalidade não pode conter mais de 30 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('nacionalidade') is not None:
+            if len(request.form.get('nacionalidade')) > 30:
+                flash('O campo Nascionalidade não pode conter mais de 30 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_rnm') is not None:
+            if len(request.form.get('crnm_rnm')) >  20:
+                flash('O campo CRNM não pode conter mais de 20 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_filiacao_a') is not None:
+            if len(request.form.get('crnm_filiacao_a')) > 60:
+                flash('O campo Filiação (a) não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_filiacao_b') is not None:
+            if len(request.form.get('crnm_filiacao_b')) > 60:
+                flash('O campo Filiação (b) não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_validade') is not None:
+            if len(request.form.get('crnm_validade')) > 10:
+                flash('O Validade (CRNM) não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_classificacao') is not None:
+            if len(request.form.get('crnm_classificacao')) > 30:
+                flash('O Classificação (CRNM) não pode conter mais de 30 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_domicilio') is not None:
+            if len(request.form.get('crnm_domicilio')) > 100:
+                flash('O campo Domicílio (CRNM) não pode conter mais de 100 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('crnm_emissao') is not None:
+            if len(request.form.get('crnm_emissao')) > 10:
+                flash('O Emissão (CRNM) não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('questao_11') is not None:
+            if len(request.form.get('questao_11')) > 12:
+                flash('O campo referente à renda da Questão 11 não pode conter mais de 12 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+        if request.form.get('obs_psr') is not None:
+            if len(request.form.get('obs_psr')) > 500:
+                flash('O campo Observação não pode conter mais de 500 caracteres.', category='error')
+                return redirect('/novo_psr')
+
+
+        # VERIFICAÇÃO DE DUPLICAÇÃO DE DOCUMENTOS CADASTRADOS NA BASE DE DADOS
+
         pessoa = Pessoa.query.filter_by(cpf=cpf).first()  # Verifica CPF
         if pessoa:
             flash(f'CPF já cadastrado. ID correspondente: {pessoa.id}.', category='error')
@@ -901,6 +1205,9 @@ def persistencia_psr():
         elif len(cpf) != 11:
             flash('O CPF deve conter exatos 11 dígitos.', category='error')
             return redirect(url_for('novo_psr'))
+
+
+
 
         pessoa = Pessoa(status='ATIVO',
                         data_criacao=now(
@@ -990,6 +1297,35 @@ def persistencia_clb():
         data_criacao = now('America/Sao_Paulo').format('DD-MM-YYYY-HH-mm-ss')
         criado_por = current_user.id
 
+        # VERIFICAÇÃO DE ENTRADA DE DADOS
+
+        if nome_civil is not None:
+            if len(nome_civil) > 60:
+                flash('O campo Nome Civil não pode conter mais de  caracteres.', category='error')
+                return redirect('/novo_clb')
+
+        if nome_social is not None:
+            if len(nome_social) > 60:
+                flash('O campo Nome Social não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_clb')
+
+        if cpf is not None:
+            if len(cpf) > 11:
+                flash('O campo CPF não pode conter mais de  caracteres.', category='error')
+                return redirect('/novo_clb')
+
+        if data_nascimento is not None:
+            if len(data_nascimento) > 10:
+                flash('O campo "Data de Nascimento" não pode conter mais de 10 caracteres.', category='error')
+                return redirect('/novo_clb')
+
+        if email is not None:
+            if len(email) > 60:
+                flash('O campo E-mail não pode conter mais de 60 caracteres.', category='error')
+                return redirect('/novo_clb')
+
+        # VERIFICAÇÃO DE DUPLICAÇÃO NA BASE DE DADOS
+
         verifica_cpf = Colaborador.query.filter_by(cpf=cpf).first()  # Verifica e-mail
         if verifica_cpf:
             flash(f'CPF já cadastrado. ID correspondente: {verifica_cpf.id}!', category='error')
@@ -1008,26 +1344,27 @@ def persistencia_clb():
         if len(nome_civil) < 2:
             flash('Nome curto demais.', category='error')
             return redirect('/novo_clb')
-        else:
 
-            colaborador = Colaborador(status='INICIO',
-                                      nome_civil=nome_civil,
-                                      nome_social=nome_social,
-                                      cpf=cpf,
-                                      data_nascimento=data_nascimento,
-                                      email=email,
-                                      tipo_clb=tipo_clb,
-                                      lotacao=lotacao,
-                                      data_criacao=data_criacao,
-                                      criado_por=criado_por)
-            senha_gerada = token_hex(7)
-            # Gera hash da senha e o atribui ao campo senha
-            colaborador.seta_senha_hash(senha_gerada)
-            db.session.add(colaborador)
-            db.session.commit()
-            flash(f'Cadastro de {colaborador.nome_civil} efetuado com sucesso! Senha temporária: {senha_gerada}', category='success')
-            del senha_gerada
-            return redirect(f'cadastro_clb/{colaborador.id}')
+
+
+        colaborador = Colaborador(status='INICIO',
+                                  nome_civil=nome_civil,
+                                  nome_social=nome_social,
+                                  cpf=cpf,
+                                  data_nascimento=data_nascimento,
+                                  email=email,
+                                  tipo_clb=tipo_clb,
+                                  lotacao=lotacao,
+                                  data_criacao=data_criacao,
+                                  criado_por=criado_por)
+        senha_gerada = token_hex(7)
+        # Gera hash da senha e o atribui ao campo senha
+        colaborador.seta_senha_hash(senha_gerada)
+        db.session.add(colaborador)
+        db.session.commit()
+        flash(f'Cadastro de {colaborador.nome_civil} efetuado com sucesso. Senha temporária: {senha_gerada}', category='success')
+        del senha_gerada
+        return redirect(f'cadastro_clb/{colaborador.id}')
 
     return redirect(f'cadastro_psr/{colaborador.id}')
 

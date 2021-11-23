@@ -1,37 +1,5 @@
-# Pacotes
-
-*.egg
-*.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-lib
-lib64
 __pycache__/
 app/__pycache__/
-*.pyc
-instance/
-
-# Logs
-pip-log.txt
-
-# Unit test / coverage reports
-.coverage
-.tox
-nosetests.xml
-
-dist/
-build/
-*.egg-info/
 bd_cadpsr.db
 venv/
-app.db
-cad_psr.log*
-database_bck.db
-projeto_off/
+
