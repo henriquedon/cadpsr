@@ -26,7 +26,7 @@ Agora é necessário efetuar a primeira migração do App. Utilize os comandos e
 
 Será necessário criar a conta do Gestor do CadPSR. Criei um script em python para facilitar as coisas. Execute:
 
->> python geracao_dados.py
+>> python3 geracao_dados.py
 
 Será pedido uma senha.
 Se tudo ocorrer bem, você será informado com o login de acesso ao sistema.
