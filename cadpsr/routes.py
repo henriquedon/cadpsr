@@ -18,7 +18,7 @@ from cadpsr.models import Colaborador, Pessoa, Acesso
 @app.before_request
 def before_request():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=15)
+    app.permanent_session_lifetime = timedelta(minutes=60)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -75,7 +75,7 @@ def index():
         flash('Para acessar outras áreas do sistema, você precisa alterar sua senha!', category='error')
         return redirect('perfil')
 
-    cadpsr_versao = 'Ver. 1.5'
+    cadpsr_versao = 'Ver. 1.5.2'
 
     return render_template("index.html", titulo='Home :: CadPSR', cadpsr_versao=cadpsr_versao,
                                                                   campos_cad=campos_cad)
@@ -161,8 +161,9 @@ def colaboradores():
                                                               titulo=titulo
                                                               )
             if campo == 'NOME':
-                colaborador = Colaborador.query.filter(Colaborador.nome_civil.like('%' + dado + '%')).first()
-                
+                colaborador = Colaborador.query.filter(Colaborador.nome_civil.like("""%""" + dado + """%""")).first()
+
+
             elif campo == 'ID':
                 if dado.isdigit():
                     colaborador = Colaborador.query.filter_by(id=int(dado)).first()
@@ -277,8 +278,7 @@ def pessoas():
                                                         )
 
             if campo == 'NOME':
-                pessoa = Pessoa.query.filter(
-                    Pessoa.nome_civil.like('%' + dado + '%')).first()
+                pessoa = Pessoa.query.filter(Pessoa.nome_civil.like('%' + dado + '%')).first()
             elif campo == 'ID':
                 if dado.isdigit():
                     pessoa = Pessoa.query.filter_by(id=int(dado)).first()

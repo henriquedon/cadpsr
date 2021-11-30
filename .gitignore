@@ -1,5 +1,5 @@
-__pycache__/
-app/__pycache__/
-bd_cadpsr.db
 venv/
-
+app.db
+bd_cadpsr.db
+cad_psr.log*
+redefinicao_senha.py
