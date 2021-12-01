@@ -5,7 +5,7 @@
 
 Recomendo utilizar um ambiente virtual para testar aplicação.
 
-Com o Python 3.8 ou 3.9 (só testei nessas versões) e com o venv (outro) devidamente ativado, execute o comando:
+Com o Python 3.8 ou 3.9 (só testei nessas versões) e com o venv (ou outro) devidamente ativado, execute o comando:
 
 >> git clone https://github.com/henriquedon/cadpsr
 
