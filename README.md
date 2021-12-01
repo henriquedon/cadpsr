@@ -13,8 +13,8 @@ Em seguida instale o Flask e as dependências do projeto a partir do arquivo req
 
 >> pip install -r requirements.txt
 
-O arquivo .flaskenv contém os comandos referentes às variáveis de ambientes a fim facilitar a execução do CadPSR. Caso você utilize Windows,
-verifique os comandos corretos a serem informado no referido arquivo.
+O arquivo '.flaskenv' contém os comandos referentes às variáveis de ambientes a fim de facilitar a execução do CadPSR. Caso você utilize Windows,
+verifique quais comandos são necessários.
 
 Agora é necessário efetuar a primeira migração do App. Utilize os comandos em sequência:
 
@@ -24,18 +24,17 @@ Agora é necessário efetuar a primeira migração do App. Utilize os comandos e
 
 >> flask db upgrade
 
-Será necessário criar a conta do Gestor do CadPSR. Criei um script em python para facilitar as coisas. Execute:
+Será necessário criar a conta do Gestor do CadPSR. Criei um script em Python para facilitar as coisas. Execute:
 
 >> python3 geracao_dados.py
 
-Será pedido uma senha.
-Se tudo ocorrer bem, você será informado com o login de acesso ao sistema.
+Será pedido uma senha. O e-mail do Gestor será informado, é através dele que se faz o acesso ao o sistema.
 
 Ainda no terminal, execute o comando:
 
 >> flask run
 
-Copio o endereço em que o servidor local e execute no navegador de sua escolha.
+Copie o endereço em que o servidor local está sendo executado e utilize um navegador web de sua escolha.
 
 Informe o e-mail e a senha.
 
