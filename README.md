@@ -1,4 +1,4 @@
-# cadpsr
+# CadPSR
 # Projeto Integrador 1 - Univesp 2021
 
 **ROTEIRO PARA EXECUÇÃO DA APLICAÇÃO DESENVOLVIDA**
